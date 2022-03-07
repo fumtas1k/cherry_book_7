@@ -13,7 +13,3 @@ class Juice
     name.hash
   end
 end
-
-def greet
-  puts "こんにちは"
-end
