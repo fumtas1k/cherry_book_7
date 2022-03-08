@@ -50,14 +50,29 @@
 クラスの<u style="color: red;">外部に公開されない</u>メソッド(旧バージョンはレシーバ付では呼び出せなかった)
 
 ### 問題:インスタンスメソッドの可視性（public, private)
-`load "lib/user.rb"`
-その前に<span style="color: red;">privateメソッドは継承される</span>(例：what_method)
-※ `User.private_instance_methods.include?(:what_method)`
+その前に<span style="color: red;">privateを含めてメソッドは継承される</span>(例：what_method)
+`load "lib/add_method_to_object.rb"`
+
+```ruby
+def what_method(method)
+  methods = %i[public protected private singleton]
+  methods.each do |m|
+    return m if send("#{m}_methods").include?(method)
+  end
+  return
+end
+```
+※
+```ruby
+String.private_instance_methods.include?(:what_method)
+String.private_methods.include?(:what_method)
+```
 `what_method`の紹介と継承チェーン(これは理解しなくてもOK)
+全てのクラスはClassクラスのインスタンスなので、Classクラスのインスタンスメソッドは、他のクラスのクラスメソッドとなる。
 <small>public記載して、再ロード</small>
 ![継承メソッドチェーン2](images/class_method_instance_method.JPG)
 
-user.rb
+`load "lib/user.rb"`
 以下のメソッドを外部から呼び出すことはできますか？
 1. User#greet
 2. User#initialize
@@ -166,7 +181,7 @@ end
 ```
 
 ### インスタンスのprotectedメソッド
-user.rb
+`load "lib/user.rb"`
 **体重は他人に公開したくない!**
 **でも、体重を他人と比較はしたい**
 
@@ -202,7 +217,7 @@ end
 
 ## クラスメソッドのpublic, private
 ### 問題（classメソッドの可視)
-user.rb
+`load "lib/user.rb"`
 以下のメソッドを外部から呼び出すことはできますか？
 1. User.counter_0
 1. User.counter_1
@@ -232,17 +247,23 @@ end
 ## モンキーパッチ
 ### 問題: 意図しないオーバーライド
 - User#get_ageはprivateメソッドでした。Userを継承したAdmin#get_ageはprivate?
-`load "lib/admin.rb"`
+`load "lib/open_user.rb"`
+```ruby
+class User
+  private
+  def get_age = @age
+end
+```
 
 ```ruby
-class Admin < User
+class OpenUser < User
   def get_age = "age: #{@age}"
 end
 ```
 
 - このコードに問題はありますか？
 `load "lib/override.rb"`
-
+`Array.name`
 ```ruby
 class Array
   def self.name
@@ -397,9 +418,9 @@ end
 - <span style="font-size: 20px; color: red;">freezeはオブジェクトの要素に対する破壊的変更は止めない</span>
 - <span style="font-size: 20px; color: red;">freezeは代入(参照変更)は止めない</span>
 
-## 変数
+# 7.9 変数
 
-### クラスインスタンス変数
+## クラスインスタンス変数
 
 インスタンス変数は、@から始まる変数です。
 `load "lib/product_i.rb"`
@@ -507,9 +528,85 @@ dvd.upcase_name
 - $で始まる変数には、「組み込み変数」、「特殊変数」として、すでに決められたものがある。（$&, $1, $stdin, $_など）
 
 
-## メソッドの再定義
-`load "lib/juice.rb"`
+# 7.10 高度な話題
 
+## エイリアスメソッドの定義
+エイリアスメソッドの例(色々な言語の影響を受けているからですかね)
+|代表的なクラス|メソッド名1|メソッド名2|
+|-|-|-|
+|String, Array etc| length | size |
+|Enumerable| map | collect |
+|Enumerable| inject | reduce |
+他にもたくさん存在するよ。
+名前が違いますが、どれも同じメソッドを呼び出しています。
+それぞれ別々にメソッドを作っているわけではなく、
+- aliasキーワードを使用して作成できます。(メソッドではなくキーワード)
+- alias_methodメソッドというものもあります。（こちらはメソッド）
+
+`load "lib/user.rb"`
+
+```ruby
+class User
+  def initialize(name:, age:, weight:)
+    @name, @age, @weight = name, age, weight
+  end
+
+  def name = @name
+
+  def greet = "私は、#{@name}です。よろしくお願いします。"
+end
+```
+`load "lib/add_alias_to_user.rb"`
+```ruby
+class User
+  alias hello greet
+
+  alias_method :original_name, :name
+  def name = "Mr. #{original_name}"
+end
+```
+
+##　メソッドを未定義と削除
+- undef: メソッドを未定義にするキーワード。その名前のメソッドを呼び出せなくなる。メソッドとしてundef_methodもある。
+- remove_method: メソッドを削除する。
+
+`load "lib/user.rb"`
+`load "lib/open_user.rb"`
+
+```ruby
+class User
+  def initialize(name:, age:, weight:)
+    @name, @age, @weight = name, age, weight
+  end
+  def greet = "私は、#{@name}です。よろしくお願いします。"
+end
+
+class OpenUser < User
+  def greet = super + "#{@age}歳です!"
+  # undef greet
+  # remove_method :greet
+end
+```
+<small style="color: red;">undef(キーワード)を使うと継承元の同名メソッドも呼び出せなくなる。一方、remove_methodを使えば継承元のメソッドは呼び出せる。</small>
+
+### 今回のまとめ
+- <span style="font-size: 20px; color: red;">別名つける時は、alias or alias_method。（引数が異なるから気をつけて）</span>
+- <span style="font-size: 20px; color: red;">undef/undef_methodはメソッドを未定義に、remove_methodは削除（継承元を呼び出せるかの違い）</span>
+
+## メソッドの再定義（オーバーライド）
+`load "lib/juice.rb"`
+ところで、以下を実行するとどうなるでしょう?
+```ruby
+x = 1
+y = 1.0
+
+x == y # 数値として等しいので、trueになります。
+x.eql? y # 1.0はFloatクラスのオブジェクトなので、falseになります。
+x.equal? y # 1.0は異なるオブジェクトIDを持つので、falseになります。
+x.equal?(1) # 1はどこで参照しても同じオブジェクトIDなので、trueになります。
+Integer === x # 右辺のオブジェクトが左辺のクラスのインスタンスならtrue.caseの比較に用いられたり、いろいろ再定義されてる。
+```
+さて、本題。
 ```ruby
 class Juice
   attr_reader :name, :price
@@ -522,24 +619,32 @@ class Juice
   end
 end
 ```
-
+ジュースインスタンスをキーとしてハッシュで在庫を管理したい。
 以下を実行したらどうなるでしょう?
 
 ```ruby
-@juices = { Juice.coke => 5}
+@juices = { Juice.coke => 5 }
 coke = Juice.coke
 @juices[coke] += 5
 ```
 
- Hashのkeyにオブジェクトを使うには、eql?メソッドとhashメソッドを再定義すれば良い。
+Hashのkeyは、**eql?メソッド**を使用して、そのkeyが同じオブジェクトか判断しています。そして、eql?は**hashメソッド**を用いて真疑値を返しています。
+
 ```ruby
 "こんにちは".hash
 "こんにちは".hash
+"こんにちは".eql?("こんにちは")
+Juice.coke.hash
+Juice.coke.hash
+Juice.coke.eql?(Juice.coke)
 ```
 
+Hashのkeyにオブジェクトを使うには、eql?メソッドとhashメソッドを再定義すれば良い。→オープンクラスを使って再定義。
 `load "lib/juice_refine.rb"`
 ```ruby
  class Juice
+  def inspect = name
+
   def eql?(other)
     other.instance_of?(Juice) && name.eql?(other.name)
   end
@@ -549,7 +654,57 @@ end
 ```
 
 ```ruby
-@juices = { Juice.coke => 5}
+@juices = { Juice.coke => 5 }
 coke = Juice.coke
 @juices[coke] += 5
 ```
+
+<span style="color: red;">注：メソッドの再定義ができないものがあります。</span>
+
+```ruby
+= ?: .. ... not && and || or ::
+```
+
+### 今回のまとめ
+- <span style="font-size: 20px; color: red;">rubyはオープンクラスであり、メソッドをオーバーライドできる。</span>
+- <span style="font-size: 20px; color: red;">不適切なオーバーライドはプログラム全体の動きをおかしくするので注意（どこにどう影響するか考えて行いましょう）。</span>
+- <span style="font-size: 20px; color: red;">railsって結構モンキーパッチしてますよね</span>
+
+## 特異メソッド
+特定のオブジェクトにだけ紐付くメソッドを定義できる。
+`直接コード打って`
+```ruby
+alice = "I am Alice"
+bob = "I am Bob"
+
+# インスタンスの特異メソッドの定義
+def alice.shuffle = chars.shuffle.join
+# class << alice
+#   def shuffle = chars.shuffle.join
+# end
+
+alice.shuffle
+bob.shuffle
+```
+
+```ruby
+# クラスメソッドを定義する例
+def String.shuffle(string) = string.chars.shuffle.join
+# class << String
+#   def String.shuffle(string) = string.char.shuffle.join
+# end
+```
+クラスメソッドも特異メソッドの一種です。
+以下の図が全てだー！疲れてきた...
+![特異メソッド説明図](images/singleton_method.png)
+
+## ダックタイピング
+オブジェクトのクラスが何であろうとそのメソッドが呼び出せれば良しとするプログラミングスタイルのこと。Ruby, Python, JavaScript等のオブジェクト指向プログラミングの動的型付けのスタイル。
+「もしもそれがアヒルのように歩き、アヒルのように鳴くのなら、それはアヒルである」
+
+
+# まとめ
+- メソッドの可視性
+- 定数
+- さまざまな種類の変数
+- クラス定義やRubyの言語仕様に関する高度な話題
