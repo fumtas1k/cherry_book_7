@@ -3,6 +3,14 @@
 <small style="color: red;">(旧バージョンでは紹介するコードは動かないことがあります)</small>
 伊藤 淳一. プロを目指す人のためのRuby入門［改訂2版］　言語仕様からテスト駆動開発・デバッグ技法まで (Software Design plus) (Japanese Edition) Kindle 版.
 
+# 参考資料
+
+1. [プロを目指す人のためのRuby入門［改訂2版］　言語仕様からテスト駆動開発・デバッグ技法まで Software Design plus](https://www.amazon.co.jp/gp/product/B09MPX7SMY)
+1. [[改訂2版]Ruby技術者認定試験合格教本(Silver/Gold対応) Ruby公式資格教科書](https://www.amazon.co.jp/dp/B0756VF9Y3)
+1. [メタプログラミングRuby 第2版](https://www.amazon.co.jp/gp/product/4873117437)
+1. [たのしいRuby 第6版](https://www.amazon.co.jp/gp/product/B07PNN3TYF)
+1. [RubyExamination](https://rex.libertyfish.co.jp/)
+
 # 最初に
 > 知らないのは恥ではない、知ろうとしないのが恥である。
 > 澤柳 政太郎
