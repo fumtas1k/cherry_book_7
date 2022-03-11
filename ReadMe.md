@@ -51,7 +51,7 @@
 - irbで **`self.class`** を打つと何が表示される？つまり、クラス名は？
 - irbやファイルにいきなり、 **`def aisatsu; end`** を書くと何クラスのインスタンスメソッドになる？
 ※ `private_methods.include?(:aisatsu)`
-![継承メソッドチェーン](images/inheritance_of_method.JPG)
+![継承メソッドチェーン](images/Inheritance_of_method.JPG)
 <small>牧 俊男,小川 伸一郎. ［改訂2版］Ruby技術者認定試験合格教本（Silver/Gold対応）Ruby公式資格教科書 (Japanese Edition) (Kindle の位置No.2069). Kindle 版. </small>
 
 # 7.7 メソッドの可視化
@@ -572,6 +572,7 @@ DVD.get_name
 |定義| インスタンスメソッド内 | クラス直下、<br>クラスメソッド内 | クラス内ならどこでも |
 |値の継承| されない | されない | 共有 |
 |未定義| nil | nil | エラー |
+
 クラス変数が使われることはそれほど多くないそうです。
 クラス変数の参照ルールも少し複雑ですが、通常はそれほど意識しなくて良いと思います。
 
@@ -593,6 +594,7 @@ DVD.get_name
 |String, Array etc| length | size |
 |Enumerable| map | collect |
 |Enumerable| inject | reduce |
+
 他にもたくさん存在するよ。
 名前が違いますが、どれも同じメソッドを呼び出しています。
 それぞれ別々にメソッドを作っているわけではなく、
