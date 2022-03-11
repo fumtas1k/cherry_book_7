@@ -14,3 +14,7 @@ class DVD < Product
   @@name = 'DVD'
   def upcase_name = @@name.upcase
 end
+
+def DVD.get_name
+  @@name
+end

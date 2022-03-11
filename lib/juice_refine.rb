@@ -8,4 +8,10 @@ class Juice
   end
 
   def hash = name.hash
+
+  def <=>(other)
+    if other.instance_of?(Juice)
+      self.name <=> other.name
+    end
+  end
 end

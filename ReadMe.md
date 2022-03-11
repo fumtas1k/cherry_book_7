@@ -12,6 +12,12 @@
 この時間を有意義にするかどうかは...**あなた次第です!**
 なお、時間を意識せず作成しているため、タイムオーバーとなったら打ち切りで。
 
+# 本日の知識のGoal
+-  **Rubyの式**（変数、定数、メソッド呼び出し、if, while, クラス定義）**には戻り値がある**
+- **インスタンス変数はオブジェクトが管理（保有）し、インスタンスメソッドはオブジェクトのクラスが管理（保有）する**
+- Rubyは**オープンクラス**なので既存のクラスに対してもオーバーライド（モンキーパンチ）ができる。が、**「大いなる力には、大いなる責任が伴う」**
+
+
 # 事前情報
 説明の関係上、irb起動中に**rubyファイル書き換える**ことがあるため、require_relativeではなく**load**を使用します。以下はなんとなくの記載なので、詳しくは自分で調べてね。
 | 条件 | require | require_relative | <span style="color: red; font-weight: bold;">load</span> |
@@ -30,13 +36,17 @@
 | 7.10 | クラス定数やRubyの言語使用に関する高度な話題 |
 | 7.11 | この章のまとめ |
 
-# 7.7 メソッドの可視化
+
 ## その前に、irbに入った時の空間に関して
 - irbで **`self`** を打つと何が表示される？つまり、インスタンス名は？
 - irbで **`self.class`** を打つと何が表示される？つまり、クラス名は？
 - irbやファイルにいきなり、 **`def aisatsu; end`** を書くと何クラスのインスタンスメソッドになる？
 ※ `private_instance_methods.include?(:aisatu)`
 ![継承メソッドチェーン](images/inheritance_of_method.JPG)
+<small>牧 俊男,小川 伸一郎. ［改訂2版］Ruby技術者認定試験合格教本（Silver/Gold対応）Ruby公式資格教科書 (Japanese Edition) (Kindle の位置No.2069). Kindle 版. </small>
+
+# 7.7 メソッドの可視化
+内部で使用し、外部には公開したくない、呼び出されると不具合等で可視性を制御したい、そもそも、外部で使用する必要がない。そんな時に...。
 
 ## インスタンスメソッドのpublic, private
 - <span style="font-size: 28px; font-weight: bold; color: green;">public</span>
@@ -71,6 +81,7 @@ String.private_methods.include?(:what_method)
 全てのクラスはClassクラスのインスタンスなので、Classクラスのインスタンスメソッドは、他のクラスのクラスメソッドとなる。
 <small>public記載して、再ロード</small>
 ![継承メソッドチェーン2](images/class_method_instance_method.JPG)
+<small>牧 俊男,小川 伸一郎. ［改訂2版］Ruby技術者認定試験合格教本（Silver/Gold対応）Ruby公式資格教科書 (Japanese Edition) (Kindle の位置No.2399). Kindle 版. </small>
 
 `load "lib/user.rb"`
 以下のメソッドを外部から呼び出すことはできますか？
@@ -122,6 +133,34 @@ end
 ```
 
 <small style="color: red;">メソッド定義は式になっているので（=を使わないとしても）メソッド名をシンボルで返す(戻り値がある)</small>
+
+> **Rubyの式には、変数と定数、さまざまなリテラル、それらの演算子式、ifや whileなどの制御構造、メソッド呼び出し(super・ブロック付き・yield)、 クラス／メソッドの定義**があります。
+式は括弧によってグルーピングすることができます。
+**式は評価されると値（評価値）が定まり、その値を返します**。ただし、return、break, next といったものは値を返しません。これらは評価された時点で制御が移ってしまいます。
+空の式 () は nil を返します。
+[Ruby3.1リファレンス](https://docs.ruby-lang.org/ja/latest/doc/spec=2fprogram.html#exp)
+
+**if文も式である（戻り値の例）**
+```ruby
+if true
+  judge = "正解"
+else
+  judge = "不正解"
+end
+puts judge
+
+# ↓
+
+judge = if true
+  "大正解"
+else
+  "不正解"
+end
+puts judge
+```
+
+万葉課題での使用例：`lib/tasks_controller.rb`
+
 ### インスタンス変数のsetter, getterメソッドのおさらい(attr_accessor)
 - メソッド定義
 
@@ -276,7 +315,7 @@ end
 継承先やそのクラスのメソッドを把握した上で行いましょう**
 
 ## 今回のポイント
-- <span style="font-size: 20px; color: red;">privateメソッドは継承される(逆説的に呼び出せない言語もある!)</span>
+- <span style="font-size: 20px; color: red;">privateメソッドは継承される(つまり、呼び出せない言語(java等)もある!)</span>
 - <span style="font-size: 20px; color: red;">クラスメソッドの可視化変更方法はインスタンスメソッドとは異なる(privateの下に定義してもprivateにはならない!)</span>
 - <span style="font-size: 20px; color: red;">戻り値が何かを意識する(メソッド定義はメソッド名のシンボル、定数・変数代入はその値)。</span>
 - <span style="font-size: 20px; color: red;">意図せぬオーバーライドに注意!</span>
@@ -380,7 +419,7 @@ MONEY_S.map{|money| money << "00" } # 要素の破壊的変更
 
 <small style="color: red;">ミュータブル（変更可能）なオブジェクト（配列やハッシュ、文字列）を要素までフリーズしたい時は大変。イミュータブル（変更不可能）なオブジェクト（数値、シンボル、真疑値）は破壊的変更ができないのでフリーズの必要はそもそもない。</small>
 
-### 定数のレキシカルスコープ
+### 定数の参照
 ファイルを実行すると何が出力されるでしょう？
 `load "lib/rexical.rb", true`
 
@@ -408,6 +447,7 @@ class C
   puts CONST
 end
 ```
+[定数参照の優先順位](https://docs.ruby-lang.org/ja/latest/doc/spec=2fvariables.html#prio)
 
 ## 今回のポイント
 - <span style="font-size: 20px; color: red;">定数なのに再代入できちゃう!(警告付)</span>
@@ -439,7 +479,6 @@ class Product
 end
 
 class DVD < Product
-  @@name = 'Class_v_DVD'
   @name = 'DVD'
   def upcase_name = @name.upcase
 end
@@ -489,6 +528,10 @@ class DVD < Product
   @@name = 'DVD'
   def upcase_name = @@name.upcase
 end
+
+def DVD.get_name
+  @@name
+end
 ```
 
 以下を実行するとどうなるでしょう?
@@ -502,7 +545,10 @@ product.name
 
 dvd = DVD.new("An awasome film")
 dvd.upcase_name
+
+DVD.get_name
 ```
+[クラス変数のスコープ](https://docs.ruby-lang.org/ja/latest/doc/spec=2fvariables.html#class_var_scope)
 
 - クラス変数は、インスタンス、継承含め、共有される！
 - クラス内部で定義される。
@@ -513,11 +559,12 @@ dvd.upcase_name
 |項目| インスタンス変数 | クラスインスタンス変数 | クラス変数 |
 |-|-|-|-|
 |記号| @ | @ | @@ |
-|管理| 各インスタンス | 各クラス | 定義されたクラス |
+|管理| 各インスタンス | 各クラス | 定義されたクラス? |
 |定義| インスタンスメソッド内 | クラス直下、<br>クラスメソッド内 | クラス内ならどこでも |
 |値の継承| されない | されない | 共有 |
 |未定義| nil | nil | エラー |
 クラス変数が使われることはそれほど多くないそうです。
+クラス変数の参照ルールも少し複雑ですが、通常はそれほど意識しなくて良いと思います。
 
 ## グローバル変数
 
@@ -702,9 +749,7 @@ def String.shuffle(string) = string.chars.shuffle.join
 オブジェクトのクラスが何であろうとそのメソッドが呼び出せれば良しとするプログラミングスタイルのこと。Ruby, Python, JavaScript等のオブジェクト指向プログラミングの動的型付けのスタイル。
 「もしもそれがアヒルのように歩き、アヒルのように鳴くのなら、それはアヒルである」
 
-
-# まとめ
-- メソッドの可視性
-- 定数
-- さまざまな種類の変数
-- クラス定義やRubyの言語仕様に関する高度な話題
+# 本日の知識のGoal
+-  **Rubyの式**（変数、定数、メソッド呼び出し、if, while, クラス定義）**には戻り値がある**
+- **インスタンス変数はオブジェクトが管理（保有）し、インスタンスメソッドはオブジェクトのクラスが管理（保有）する**
+- Rubyは**オープンクラス**なので既存のクラスに対してもオーバーライド（モンキーパンチ）ができる。が、**「大いなる力には、大いなる責任が伴う」**
