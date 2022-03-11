@@ -1,5 +1,6 @@
 class User
-  protected attr_reader :weight
+  # protected attr_reader :weight
+  # private attr_reader :weight
   attr_reader :name
   @@count = 0
   def greet = "私は、#{@name}です。よろしくお願いします。"

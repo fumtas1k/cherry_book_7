@@ -1,4 +1,4 @@
-# public
+public
 # Objectクラスのインスタンス(main)のメソッドを定義
 def what_method(method)
   methods = %i[public protected private singleton]
