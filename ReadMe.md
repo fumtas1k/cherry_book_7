@@ -1,6 +1,7 @@
 # 第7章 クラスの作成を理解する
 〜ruby 3.0以降〜
 <small style="color: red;">(旧バージョンでは紹介するコードは動かないことがあります)</small>
+
 伊藤 淳一. プロを目指す人のためのRuby入門［改訂2版］　言語仕様からテスト駆動開発・デバッグ技法まで (Software Design plus) (Japanese Edition) Kindle 版.
 
 # 参考資料
